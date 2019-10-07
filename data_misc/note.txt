@@ -1,0 +1,359 @@
+Missng data solution: 1, remove line(s) (not recommended)
+		      2, replace with the mean value
+categorical data: dummy values
+feature scaling
+
+warning:
+from sklearn.cross_validation import train_test_split will be change to
+from sklearn.model_selection import train_test_split
+
+
+
+REGRESSION:
+linear regression assumptions:
+	linearity
+	homoscedasticity (https://www.statisticssolutions.com/homoscedasticity/)
+	multivariate normality (https://en.wikipedia.org/wiki/Multivariate_normal_distribution)
+	independence of errors 
+	lack of multicollinearity (https://en.wikipedia.org/wiki/Multicollinearity)
+
+simple linear regression:
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 2 - Regression/Section 4 - Simple Linear Regression/Salary_Data.csv
+	problem description:
+		find correlation (if any) between year exp and salary. 
+	simple linear regression: this example - more year exp more salary kind of like the slope
+y = b_0 + b_1x (_ like in latex)
+	ordinary least square: sum(y - (y)^) -> min
+		y_i: actually earn
+		(y_i)^: according to model
+		linear regression draw line y - (y)^, take sum, find min voila.
+	both python and r need to change test_set for the actual salary (point), but not for line since it is the same model equation (line is defined by 2 points)
+
+multiple linear regression:
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 2 - Regression/Section 5 - Multiple Linear Regression/50_Startups.csv
+	problem description:
+		which type of company you are most interest in investing
+	multiple linear regression: y = b_0 + b_1*x_1 + b_2*x_2 + ... + b_n*x_n, this example - predict the profit based on R&D spend, adminitration spend, Marketing spend
+	dealling with catergorical variable: dummy variable (+b_(n-1) * D_1) basically need n - 1 value dummy variables per set of dummy variables
+	dummy variable trap: duplicate variables
+	p-value:
+		https://www.mathbootcamps.com/what-is-a-p-value/
+		https://www.wikihow.com/Calculate-P-Value
+		formal = the p-value is the probability that, if the NULL hypothesis were true, sampling variation would produce an estimate that is futher away from the hypothesised value than our data estimate
+	build a model:
+		reasons: not reliable, hard to explain
+		methods: all-in, backward elimination, forward selection, bidirectional elimination, score comparison  (stepwise regression = 2, 3, 4*)
+		all-in: put all of them in because: prior knowledge, have to, preparing for 2
+		backward elimination:
+			select the significance lvl to stay (sl = 0.05)
+			fit full model with all possible predictors
+			consider the predictor with the highest p-value. if p > sl go to next line, else fin
+			remove the predictor
+			fit model without that predictor, back to line 3
+			fin: ready
+		forward selection:
+			select the significance lvl to enter (sl = 0.05)
+			fit all simple regression models y = x_n. Select the lowest p-value one
+			keep this variable and fit all possible models with one extra predictor added to the one(s) you already have
+			consider the predictor with the lowest p-value. if p > sl go to line 3, else fin
+			fin: ready (keep the previous model)
+		bidirectional elimination:
+			select the significance lvl to enter and to stay (slenter = slstay = 0.05)
+			fit all simple regression models y = x_n. Select the lowest p-value one(next step of forward selection)
+			{
+				fit full model with all possible predictors
+				consider the predictor with the highest p-value. if p > sl go to next line, else fin
+				remove the predictor
+				fit model without that predictor, back to line 3
+			} (perform all step of backward elimination)
+			go back to line 2, no new variales can enter and no old one can exit
+			fin: model ready
+		all possible models:
+			selct a criterion of goodness of fit (akaike criterion)
+			construct all possible regression model
+			select the one with the best criterion
+
+polinominal regression: e.g. epedemic speard
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 2 - Regression/Section 6 - Polynomial Regression/Position_Salaries.csv
+	problem description: predict the actual salary through position, year
+
+Support vector regression:
+	instead of trying to fit the largest street between two classes while limiting margin violations like linear regression, SVR tries to fit as many instances as possible on the street while limiting margin violations.
+	width of street controled by a hyper parameter Epsilon.
+	step:
+		1, traning set theta = {vec(x), vec(y)}
+		2, choose a kernel and it's parameters as well as regularization
+		3, form a correlation matrix
+		4, train to get contraction coefficients vec(a) = {a_i}
+		5, create your estimator f(vec(X), vec(a), x^(*)) = y^(*)
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 2 - Regression/Section 7 - Support Vector Regression (SVR)/Position_Salaries.csv
+	same problem as polinominal regression
+
+decision tree: (regression tree)
+	basically create a binary tree
+	create split(s) in data, each domain(terminal leaf) calculate avg(y), assign avg(y) to new point in domain(terminal leaf), (update avg(y))
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 2 - Regression/Section 8 - Decision Tree Regression/Position_Salaries.csv
+	same problem as polinominal regression
+	this is a non-continous regression
+	(if you want to visualize the result, change to higher resolution) (for future use, already fix in decision_tree.py)
+
+random forest:
+	basically a group (forest) of decision tree
+	ensemble learning (random forest is a version of)
+	step:
+		pick a random K data points
+		build a decision tree associated to these K poins
+		choose a number of Ntrees to build, repeat 1 and 2
+		for a new data point, make each tree predict and take avg (can update avg if needed)
+		dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 2 - Regression/Section 9 - Random Forest Regression/Position_Salaries.csv
+		same problem as polinominal regression
+		(if you want to visualize the result, change to higher resolution) (for future use, already fix in random_forest.py)
+
+ensemble >= single model
+		
+Rsquared = 1 - SSres / SStot
+	with SSres = sum(y_i - (y)^(^)_i)^2, SStot = sum(y_i - (y)^(^)_avg)^2
+	show how good your line compare to the y = y_avg
+	closer to 1 better
+
+Adjusted Rsquared: add more variable make Rsquared never decrease
+	AdjRsquared = 1 - (1-R^2)/frac{n-1}{n - p - 1}
+		with p - number of regressor
+		     n - sample size
+			
+
+
+CLASSIFICATION:
+logistic regression:
+	predict the probability of the action is taken
+	sigmoid function: P = 1/(1+e^{-y})	
+	->ln(P/(1-P)) = b_0 + b_1 * x
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 3 - Classification/Section 14 - Logistic Regression/Social_Network_Ads.csv
+	problem description: which of its user actually buy the goods based on age and salary
+	LR is a linear classifier
+K-NN:
+	choose number K of neighbors
+	take the K nearst neighbors of the new data point, according to the Euclidean distance
+	among these K neighbors, count the number of data points in each category
+	asign the new data point to the category where you counted the most neighbors
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 3 - Classification/Section 15 - K-Nearest Neighbors (K-NN)/Social_Network_Ads.csv
+	same problem as logistic regression
+	
+		
+Support vector machine:
+	support vector, negative boundary, positive boundary
+	look at the "worst" representation of the class make it support vector
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 3 - Classification/Section 16 - Support Vector Machine (SVM)/Social_Network_Ads.csv
+	same problem as logistic regression
+
+	kernel SVM:
+		for non linearly seperable problem but possible to draw a seperator
+		by looking into higher dimensional place
+		mapping to a higher dimension: make some kind of curve (highly compute-intensive)(not recommended)
+		kernel trick: K(/vec{x}, /vec{l^i}) = exp(-(/frac{(/abs{/vec{x} - /vec{l^i}}) ^ 2}{2*/sigma^2}))
+		find optimal /vec{l} landmark, make a circle around the base of "the mountain", changing /sigma change the radius of circle aka. take more (/sigma up) or less(/sigma down)
+		type of kernel rbf, polynominal, signoid
+		dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 3 - Classification/Section 17 - Kernel SVM/Social_Network_Ads.csv
+		same problem as logistic regression
+
+Navie bayes:
+	bayes theorem: P(A /mid B) = /frac{P(B /mid A) * P(A)}{P(B)}
+	Prior probability P(A) -> marginal likelihood P(B) -> likelihood P(B /mid A) -> posterior probability P(A /mid B)
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 3 - Classification/Section 18 - Naive Bayes/Social_Network_Ads.csv
+	same problem as logistic regression
+	
+Decision tree:
+	kind of like regression decision tree
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 3 - Classification/Section 20 - Random Forest Classification/Social_Network_Ads.csv
+	same problem as logistic regression
+
+Random forest:
+	kind of like regression random forest
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 3 - Classification/Section 20 - Random Forest Classification/Social_Network_Ads.csv
+	same problem as logistic regression
+		
+
+CAP curve:
+
+
+CLUSTERING:
+	Clustering is similar to classification, but the basis is different. In Clustering you don’t know what you are looking for, and you are trying to identify some segments or clusters in your data. 
+K-means:
+	choose the number K of clusters
+	at random K points, the centroids (not necessarily from dt)
+	assign each data point to the closest centroid
+	compute and place the new centroid of each cluster
+	reassign each data point to the closest centroid, recalculate centroid. If not change then fin
+	random initialization trap: bad random -> wrong answer
+	select K: elbow rule
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 4 - Clustering/Section 24 - K-Means Clustering/Mall_Customers.csv
+	problem description: segment the clients to different group based on annual income, spending score
+
+Hierachical: 
+	agglomerative: bottom-up
+		make each data point a single-ponit cluster
+		make a 2- data points cluster from the closest data points
+		take 2 closest clusters and make a cluster
+		repeat till 1 cluster
+	dendrogram:
+		using within-cluster variance		
+		set threshold, no of clusters = no of line cutted
+	optimal #: can be the longest segment of line without crossing existing horizontal line in dendrogram
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 4 - Clustering/Section 25 - Hierarchical Clustering/Mall_Customers.csv
+	same problem as K-means clustering
+
+
+ASSOCIATION RULE LEARNING:
+	People who bought also bought ... That is what Association Rule Learning will help us figure out! 
+Apriori:
+	3 parts:
+		support(X) = /frac{# of people do (X)}{# of all people}
+		confidence(X1 -> X2) = /frac{# of people do (X1) and (X2}{# of people do (X1)}
+		lift(X1 -> X2) = /frac{confidence(X1 -> X2)}{support(X2)}
+	steps:
+		set a minimum support and confidence
+		take all the subsets in transactions having higher support than the minimum
+		take all the rule of these subsets having higher confidence than minimum confidence
+		sort the rule by decreasing lift
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 5 - Association Rule Learning/Section 28 - Apriori/Market_Basket_Optimisation.csv
+	problem description: recommendation the goods for customers
+	try -> see rule -> change if not satisfy
+	problem: too high confidence
+
+Eclat:
+	support (but instead of one, it's a combination of some)
+	steps:
+		set a minimum support
+		take all the subsets in transactions having higher support than the minimum
+		sort these subsets by decreasing support
+		
+
+REINFORCEMENT LEARNING:
+	Reinforcement Learning is a branch of Machine Learning, also called Online Learning. It is used to solve interacting problems where the data observed up to time t is considered to decide which action to take at time t + 1. It is also used for Artificial Intelligence when training machines to perform tasks such as walking. Desired outcomes provide the AI with reward, undesired with punishment. Machines learn through trial and error.
+Upper confidence bound:
+	multi-armed bandit: max return on multiple slot machine
+	steps:
+		consider 2 number for each ad i			
+			N_i(n) = number of time ad i selected up to round n
+			R-i(n) = sum of reward of ad i up to round n
+		compute: average reward /avg{r_i(n)} = /frac{R_i(n)}{N_i(n)}
+			 confidence interval [/avg{r_i(n)} - /delta_i(n), /avg{r_i(n)} + /delta_i(n)]
+			 /delta_i(n) = /sqrt{/frac{3*log(n)}{2*N_i(n)}}
+		select i that has maximum /avg{r_i(n)} + /delta_i(n)
+	dataset: :~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 6 - Reinforcement Learning/Section 32 - Upper Confidence Bound (UCB)/Ads_CTR_Optimisation.csv
+	problem description: select the best ad to display
+
+Thompson sampling:
+	steps:
+		consider 2 number for each ad i
+			N_{i}^{1}(n) = number of times the ad i got reward 1 up to round n
+			N_{i}^{0}(n) = number of times the ad i got reward 1 up to round n
+		each ad i, we take a radom draw from the distribution:
+			/theta_i(n) = /beta(N_{i}^{1}(n) + 1, N_{i}^{0}(n) + 1)
+		select the ad with the highest /theta_i(n)
+	try to construct where the /muy^* value will be
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 6 - Reinforcement Learning/Section 33 - Thompson Sampling/Ads_CTR_Optimisation.csv
+	same problem as UCB
+
+compare these two:
+	+UCB:   deterministic
+		requires update at very round
+		
+	+Thompson: probabilistic
+		   can accomodate delay feedback
+		   better empirical evidences
+
+Natural language processing - NLP	
+	area of comp sci and ai concern with the interations between computers and human language
+	usage:
+		sentiment analysis
+		predict genre
+		question answering
+		machine translator or speech recognition
+		document summarization
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 7 - Natural Language Processing/Section 36 - Natural Language Processing/Restaurant_Reviews.tsv
+	problem description: predict future reviews whether it's positive or negative
+
+
+Deep learning:
+artificial neural network
+	mimic how the human brain work.
+	activation function:
+		4 widely used functions:
+			threshold fuction: \omega(x) = 1 if x >= 0 && = 0 if x < 0
+			sigmoid: \omega(x) = \frac{1}{1 + e^(-x)}
+			rectifier: \omega(x) = max(x, 0)
+			hyperbolic tangent (tanh) \omega(x) = \frac{1 - e^(-2x)}{1 + e^(-2x)}
+	gradient descent:
+		cost function: c = 1/2 (y^^ - y)^2
+	stochastic gradient descent:
+		take a single row to apply gradient
+		stochastic: randomness
+	backpropagation:
+		which allow to adjust at the same time know which part of error each of your weight in NN is responsible for
+		steps:
+			randomly initialise the weightst to small numbers
+			input the first observation put to input node
+			propagate the activitions until getting the predicted result y
+			compare the predicted result to the actual result. measure generated error
+			update the weights according to how much they are responsible for the error. the learning rate decides by how much we update the weights.
+			repeat and update the weight after each (batch) observation(s)
+			after the whole training set passed through the ANN, this is an epoch, redo to create more
+artificial neural network:
+		dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 8 - Deep Learning/Section 39 - Artificial Neural Networks (ANN)/Churn_Modelling.csv
+		problem desciption: predict which customers is at higher risk of leaving
+convolutional neural network:
+	especially good at computer vision realated problem
+	convolution:
+		(f*g)(t) := \int ^{\infty} _{-\infty} f(\tau)g(t - \tau)dt
+		losing some info but feature detector get feature integrity
+	ReLU (rectifier linear unit): give non-linear to image
+	max polling: spacial var deal with distotred images
+		move the window size n * n (2 * 2) in featue map, select the biggest number in the window disregard the other n ^ 2 - 1 (3)
+		GET rid of unimportance features, params
+	flattening: put the pooled feat map to a column (input layer)
+	full connection: add an ANN
+	softmax & cross-entropy:
+		softmax: f_j(z)= \frac{e^[z_j]}{\sum_ke^{z_k}}
+		cross-entropy: H(p,q) = - \sum p(x) \log q(x)
+			better (compare to MSE on classification)
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 8 - Deep Learning/Section 40 - Convolutional Neural Networks (CNN)/dataset/
+		is a folder
+		contain sub folder trainning set, test set. Each in turn has 2 sub folders cat and dog that contain .jpg picture of the animal in the name.
+
+
+Dimensionality Reduction:
+principal component analysis (PCA):
+	most used unsupervised.
+	used in: noise filtering, visualization, feature extraction, ...
+	goal: identify patterns in data
+	      detect the correlation between variables (reduce dimension)
+	main function:
+		stdlize the data
+		obtain the eigenvectors and eigenvalues from the covariance matrix or correlation matrix or perform singular vector decomposition
+		sort eigenvalues in descending order and choose the k eigen vectors tha corresponding to the k largest eigenvalues where k is the number of dimensions of the new feature subspace (k <= d)
+		construct the projection matrix W from the selected k eigenvectors
+		transform the original dataset X via W to obtain a k-dimensional feature subspace Y
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 9 - Dimensionality Reduction/Section 43 - Principal Component Analysis (PCA)/Wine.csv
+
+
+Linear discriminant analysis:
+	used as a dimensionality reduction technique
+	pre-processing step for pattern clasification
+	same as PCA
+
+kernel PCA;
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 9 - Dimensionality Reduction/Section 45 - Kernel PCA/Social_Network_Ads.csv
+
+
+Model Selection
+k-Fold Cross Validation:
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 10 - Model Selection & Boosting/Section 48 - Model Selection/Social_Network_Ads.csv
+Grid search:
+	improve model
+	dataset: same as k-Fold
+
+
+XGBoost:
+	dataset: ~/machineLearning/Machine-Learning-A-Z-New/Machine Learning A-Z New/Part 10 - Model Selection & Boosting/Section 49 - XGBoost/Churn_Modelling.csv
+		
