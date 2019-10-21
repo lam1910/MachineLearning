@@ -56,8 +56,8 @@ itemDataset = pd.read_csv(filepath_or_buffer = 'ml-100k/u.item', sep = '|', head
     , "Children's", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", "Musical", "Mystery"
     , "Romance", "Sci-Fi", "Thriller", "War", "Western"], encoding='ISO-8859-1')
 # exercise/recommendationSystem/ml-100k/u.item
-mappingDataset = pd.read_csv(filepath_or_buffer = 'ml-100k/u.data', sep = '\t', header = None, names = ['userid', 'movieid'
-    , 'rating', 'timestamp'])
+mappingDataset = pd.read_csv(filepath_or_buffer = 'ml-100k/u.data', sep = '\t', header = None, names = ['userid'
+    , 'movieid', 'rating', 'timestamp'])
 # exercise/recommendationSystem/ml-100k/u.data
 
 
@@ -80,7 +80,8 @@ mapping_train, mapping_test = train_test_split(mapping, test_size = 0.2, random_
 from lightfm import data
 dataset = data.Dataset()
 
-dataset.fit(users = (userInfor[:,0]), items = (itemInfor[:,0]), user_features = (userInfor[:,1]), item_features = (itemInfor[:,1]))
+dataset.fit(users = (userInfor[:,0]), items = (itemInfor[:,0]), user_features = (userInfor[:,1])
+            , item_features = (itemInfor[:,1]))
 dataset.fit_partial(user_features = userInfor[:,2], item_features = itemInfor[:,2])
 dataset.fit_partial(user_features = userInfor[:,3], item_features = itemInfor[:,3])
 dataset.fit_partial(user_features = userInfor[:,4], item_features = itemInfor[:,4])
@@ -106,18 +107,26 @@ dataset.fit_partial(item_features = itemInfor[:,21])
 itemFeatures = dataset.build_item_features(((item[0], [item[1], item[2], item[3], item[4], item[8], item[6], item[7]
     , item[8], item[9], item[10], item[11], item[12], item[13], item[14], item[15], item[16], item[17]
     , item[18], item[19], item[20], item[21]]) for item in itemInfor), normalize = False)
-userFeatures = dataset.build_user_features(((user[0], [user[1], user[2], user[3], user[4]]) for user in userInfor), normalize = False)
+userFeatures = dataset.build_user_features(((user[0], [user[1], user[2], user[3], user[4]]) for user in userInfor)
+                                           , normalize = False)
 # build interaction
 mappingFeatures = dataset.build_interactions(((mappingi[0], mappingi[1], mappingi[2]) for mappingi in mapping))
-mappingFeatures_train = dataset.build_interactions(((mappingi[0], mappingi[1], mappingi[2]) for mappingi in mapping_train))
-mappingFeatures_test = dataset.build_interactions(((mappingi[0], mappingi[1], mappingi[2]) for mappingi in mapping_test))
+mappingFeatures_train = dataset.build_interactions(((mappingi[0], mappingi[1], mappingi[2])
+                                                    for mappingi in mapping_train))
+mappingFeatures_test = dataset.build_interactions(((mappingi[0], mappingi[1], mappingi[2])
+                                                   for mappingi in mapping_test))
 
 from lightfm import LightFM
 from lightfm.evaluation import precision_at_k
 
 model = LightFM(learning_schedule = 'adadelta', loss='bpr')
-model.fit(mappingFeatures_train[0], item_features = itemFeatures, user_features = userFeatures, sample_weight = mappingFeatures_train[1])
+model.fit(mappingFeatures_train[0], item_features = itemFeatures, user_features = userFeatures
+          , sample_weight = mappingFeatures_train[1])
 
 
-print("Train precision at 5th: %.2f" % precision_at_k(model, mappingFeatures_train[1], item_features = itemFeatures, user_features = userFeatures, k = 5).mean())
-print("Test precision at 5th: %.2f" % precision_at_k(model, mappingFeatures_test[1], item_features = itemFeatures, user_features = userFeatures, k = 5).mean())
+print("Train precision at 5th: %.2f"
+      % precision_at_k(model, mappingFeatures_train[0], item_features = itemFeatures
+                       , user_features = userFeatures, k = 5).mean())
+print("Test precision at 5th: %.2f"
+      % precision_at_k(model, mappingFeatures_test[0], item_features = itemFeatures
+                       , user_features = userFeatures, k = 5).mean())
