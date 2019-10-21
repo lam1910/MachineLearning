@@ -26,7 +26,7 @@ for row in X:
 
 df1['flattened'] = flatten
 
-rollback.to_csv(path_or_buf = 'ecommerce-datset/category-tree.csv', sep = ',')
+# rollback.to_csv(path_or_buf = 'ecommerce-datset/category-tree.csv', sep = ',')
 # exercise/recommendationSystem/example_data/ecommerce-dataset/category_tree.csv
 
 df1.to_csv(path_or_buf = 'ecommerce-datset/category-tree-ver2.csv', sep = ',')

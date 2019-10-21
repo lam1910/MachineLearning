@@ -126,32 +126,50 @@ plotScatterMatrix(df4, 6, 15)
 full_dataset = df3.append(df4, ignore_index = True, sort = True)"""
 
 
-dataset = df2.replace(['view', 'addtocart', 'transaction'], [0, 1, 2])
-# addtocart: 1
-# transaction: 2
-# view: 0
+dataset = df2.replace(['view', 'addtocart', 'transaction'], [1, 3, 5])
+# addtocart: 3
+# transaction: 5
+# view: 1
 
 dataset = dataset.iloc[:, [1, 3, 2]]
 
 del df2
 gc.collect()
 
-from surprise import SVD
+from surprise import NMF
 from surprise.model_selection import train_test_split
 from surprise.dataset import Dataset
 from surprise import Reader
 from surprise import accuracy
 
-reader = Reader(rating_scale=(0, 2))
+reader = Reader(rating_scale=(1, 5))
 
 true_dataset = Dataset.load_from_df(dataset, reader)
 
-algo = SVD()
+algo = NMF()
 trainset, testset = train_test_split(true_dataset, test_size=.25)
 algo.fit(trainset)
 predictions = algo.test(testset)
 
+transacNum = 0
+accPred = 0
+
 for prediction in predictions:
-    print(prediction)
+    if prediction.r_ui == 5:
+        transacNum += 1
+        if prediction.est > 3:
+            accPred += 1
+
+print("Print all prediction to result-nmf.txt")
+with open('result-nmf.txt', 'a') as f:
+    f.write("Iteration 1:\n")
+    f.write('______________________________\n\n')
+    for prediction in predictions:
+        f.write(prediction)
+
+    f.write('\n')
+
+
+print("Number of transaction: %(t)s; Number of rows correctly marked as transaction (r_ui = 5, est > 3): %(a)r." %{'t': transacNum, 'a': accPred})
 
 print("RMSE: %(r)s, MSE: %(m)s and FCP: %(f)s." %{'r': accuracy.rmse(predictions), 'm': accuracy.mse(predictions), 'f': accuracy.fcp(predictions)})
