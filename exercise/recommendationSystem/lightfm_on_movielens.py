@@ -76,31 +76,31 @@ mapping_train, mapping_test = train_test_split(mapping, test_size = 0.2, random_
 
 
 
-# build lightfm dataser
+# build lightfm dataset
 from lightfm import data
 dataset = data.Dataset()
 
-dataset.fit(users = (userInfor[:,0]), items = (itemInfor[:,0]), user_features = (userInfor[:,1])
-            , item_features = (itemInfor[:,1]))
-dataset.fit_partial(user_features = userInfor[:,2], item_features = itemInfor[:,2])
-dataset.fit_partial(user_features = userInfor[:,3], item_features = itemInfor[:,3])
-dataset.fit_partial(user_features = userInfor[:,4], item_features = itemInfor[:,4])
-dataset.fit_partial(item_features = itemInfor[:,6])
-dataset.fit_partial(item_features = itemInfor[:,7])
-dataset.fit_partial(item_features = itemInfor[:,8])
-dataset.fit_partial(item_features = itemInfor[:,9])
-dataset.fit_partial(item_features = itemInfor[:,10])
-dataset.fit_partial(item_features = itemInfor[:,11])
-dataset.fit_partial(item_features = itemInfor[:,12])
-dataset.fit_partial(item_features = itemInfor[:,13])
-dataset.fit_partial(item_features = itemInfor[:,14])
-dataset.fit_partial(item_features = itemInfor[:,15])
-dataset.fit_partial(item_features = itemInfor[:,16])
-dataset.fit_partial(item_features = itemInfor[:,17])
-dataset.fit_partial(item_features = itemInfor[:,18])
-dataset.fit_partial(item_features = itemInfor[:,19])
-dataset.fit_partial(item_features = itemInfor[:,20])
-dataset.fit_partial(item_features = itemInfor[:,21])
+dataset.fit(users = (userInfor[:, 0]), items = (itemInfor[:, 0]), user_features = (userInfor[:, 1])
+            , item_features = (itemInfor[:, 1]))
+dataset.fit_partial(user_features = userInfor[:, 2], item_features = itemInfor[:, 2])
+dataset.fit_partial(user_features = userInfor[:, 3], item_features = itemInfor[:, 3])
+dataset.fit_partial(user_features = userInfor[:, 4], item_features = itemInfor[:, 4])
+dataset.fit_partial(item_features = itemInfor[:, 6])
+dataset.fit_partial(item_features = itemInfor[:, 7])
+dataset.fit_partial(item_features = itemInfor[:, 8])
+dataset.fit_partial(item_features = itemInfor[:, 9])
+dataset.fit_partial(item_features = itemInfor[:, 10])
+dataset.fit_partial(item_features = itemInfor[:, 11])
+dataset.fit_partial(item_features = itemInfor[:, 12])
+dataset.fit_partial(item_features = itemInfor[:, 13])
+dataset.fit_partial(item_features = itemInfor[:, 14])
+dataset.fit_partial(item_features = itemInfor[:, 15])
+dataset.fit_partial(item_features = itemInfor[:, 16])
+dataset.fit_partial(item_features = itemInfor[:, 17])
+dataset.fit_partial(item_features = itemInfor[:, 18])
+dataset.fit_partial(item_features = itemInfor[:, 19])
+dataset.fit_partial(item_features = itemInfor[:, 20])
+dataset.fit_partial(item_features = itemInfor[:, 21])
 
 
 # build feature
@@ -118,6 +118,7 @@ mappingFeatures_test = dataset.build_interactions(((mappingi[0], mappingi[1], ma
 
 from lightfm import LightFM
 from lightfm.evaluation import precision_at_k
+from lightfm.evaluation import auc_score
 
 model = LightFM(learning_schedule = 'adadelta', loss='bpr')
 model.fit(mappingFeatures_train[0], item_features = itemFeatures, user_features = userFeatures
@@ -130,3 +131,11 @@ print("Train precision at 5th: %.2f"
 print("Test precision at 5th: %.2f"
       % precision_at_k(model, mappingFeatures_test[0], item_features = itemFeatures
                        , user_features = userFeatures, k = 5).mean())
+
+print("ROC AUC metric for train: %.2f"
+      % auc_score(model, mappingFeatures_train[0], item_features = itemFeatures
+                       , user_features = userFeatures).mean())
+
+print("ROC AUC metric for test: %.2f"
+      % auc_score(model, mappingFeatures_test[0], item_features = itemFeatures
+                       , user_features = userFeatures).mean())
