@@ -120,7 +120,7 @@ from lightfm import LightFM
 from lightfm.evaluation import precision_at_k
 from lightfm.evaluation import auc_score
 
-model = LightFM(learning_schedule = 'adadelta', loss='bpr')
+model = LightFM(learning_schedule = 'adagrad', loss='bpr')
 model.fit(mappingFeatures_train[0], item_features = itemFeatures, user_features = userFeatures
           , sample_weight = mappingFeatures_train[1])
 
