@@ -256,8 +256,7 @@ length_of_vector = np.linalg.norm(x = processed_data, axis = 1)
 del all_items
 gc.collect()
 
-warnings.warn('Main Part of the program. Extremely compute-intensive. Can be reduce to a 5000 * 5000 size array'
-         '. Note to change items list and items_not_tagged list')
+warnings.warn('Main Part of the program. Extremely compute-intensive. Can be reduce to a 5000 * 5000 size array. Note to change items list and items_not_tagged list')
 matrix_of_cos = np.ones(shape = (10381, 10381), dtype = float)
 
 for i in range(10381):
