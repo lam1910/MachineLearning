@@ -184,8 +184,7 @@ tmpDataset = pd.read_csv(filepath_or_buffer = 'ml-20m/genome-tags.csv', sep = ',
 # exercise/recommendationSystem/ml-20m/genome-tags.csv
 
 
-warnings.warn("Due to the fact that movieId is in type of integer, dtype in series.astype = int. In other problem, might"
-              " want to change it to str")
+warnings.warn("Due to the fact that movieId is in type of integer, dtype in series.astype = int. In other problem, might want to change it to str")
 items = tagScoreDataset.movieId.astype(int).unique().tolist()
 rows_of_array = []
 print("Adding the movieId at the beginning of each row for printing out the processed data as "
