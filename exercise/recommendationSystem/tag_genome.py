@@ -183,8 +183,9 @@ tagScoreDataset = pd.read_csv(filepath_or_buffer = 'ml-20m/genome-scores.csv', s
 tmpDataset = pd.read_csv(filepath_or_buffer = 'ml-20m/genome-tags.csv', sep = ',')
 # exercise/recommendationSystem/ml-20m/genome-tags.csv
 
-
-warnings.warn("Due to the fact that movieId is in type of integer, dtype in series.astype = int. In other problem, might want to change it to str")
+message = "Due to the fact that movieId is in type of integer, dtype in series.astype = int. In other problem, might " \
+          "want to change it to str"
+warnings.warn(message, stacklevel = 1)
 items = tagScoreDataset.movieId.astype(int).unique().tolist()
 rows_of_array = []
 print("Adding the movieId at the beginning of each row for printing out the processed data as "
@@ -218,7 +219,8 @@ retain = list(range(1, 1129))
 try:
     processed_data = output.iloc[:, retain].values
 except IndexError:
-    warnings.warn('process_data do not contain movie Id, safe to use without the need of filtering')
+    message = 'process_data do not contain movie Id, safe to use without the need of filtering'
+    warnings.warn(message, stacklevel = 1)
 finally:
     del retain, output
     gc.collect()
@@ -256,7 +258,9 @@ length_of_vector = np.linalg.norm(x = processed_data, axis = 1)
 del all_items
 gc.collect()
 
-warnings.warn('Main Part of the program. Extremely compute-intensive. Can be reduce to a 5000 * 5000 size array. Note to change items list and items_not_tagged list')
+message = 'Main Part of the program. Extremely compute-intensive. Can be reduce to a 5000 * 5000 size array. Note to ' \
+          'change items list and items_not_tagged list'
+warnings.warn(message, stacklevel = 1)
 matrix_of_cos = np.ones(shape = (10381, 10381), dtype = float)
 
 for i in range(10381):
@@ -276,7 +280,8 @@ def recommend(n):
     try:
         input = int(n)
     except ValueError:
-        warnings.warn('Cannot recognize input. Will return None', SyntaxWarning)
+        message = 'Cannot recognize input. Will return None'
+        warnings.warn(message, SyntaxWarning, stacklevel = 1)
         return None
 
     if input in items:
@@ -302,7 +307,8 @@ def getMovieInfor(id):
     try:
         input = int(id)
     except ValueError:
-        warnings.warn('Cannot recognize input. Will return None', SyntaxWarning)
+        message = 'Cannot recognize input. Will return None'
+        warnings.warn(message, SyntaxWarning, stacklevel = 1)
         return None
 
     if input in items or input in items_not_tagged:
