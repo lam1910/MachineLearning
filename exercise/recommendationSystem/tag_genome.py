@@ -236,7 +236,7 @@ for item in all_items:
 
 # perform PCA
 from sklearn.decomposition import PCA
-pca = PCA(n_components = 275)
+pca = PCA(n_components = 0.9, whiten = True, svd_solver = 'full')
 
 processed_data = pca.fit_transform(processed_data)
 
