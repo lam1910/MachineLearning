@@ -70,8 +70,6 @@ interaction = interaction.iloc[:, [1, 3, 5, 6]]
 
 # create interaction with rating as number of product that the customer buy
 by_no_product = interaction.groupby(['CustomerId', 'ProductId'], sort = False).sum().so_luong.reset_index(drop = False)
-# create interaction with rating as how much the order worth
-# by_money = interaction.groupby(['CustomerId', 'ProductId'], sort = False).sum().amount.reset_index(drop = False)
 
 def rescaling(dataset, column, list_of_ms):
     # Rescaling the value in dataset[column] to 0, 1, ... 5 based on [min, n1), [n1, n2), [n2, n3), [n3, n4)
@@ -112,18 +110,15 @@ def rescaling(dataset, column, list_of_ms):
 # number based on real life observation of the datasets. Must change each time making any changes the dataset
 # or using a new one.
 rescaling(by_no_product, 'so_luong', [2, 10, 100, 1000])
-#rescaling(by_money, 'amount', [20000, 50000, 100000, 500000])
 
 # rename to rating
 by_no_product.rename(columns = {'so_luong': 'rating'}, inplace = True)
-# by_money.rename(columns = {'amount': 'rating'}, inplace = True)
 
 all_customer = by_no_product.CustomerId.values
 all_product = by_no_product.ProductId.values
 
 # splitting dataset
 no_prod_train, no_prod_test = train_test_split(by_no_product.values, test_size = 0.2, random_state = 0)
-# money_train, money_test = train_test_split(by_money.values, test_size = 0.2, random_state = 0)
 
 # build lightfm dataset
 
@@ -140,17 +135,6 @@ mappingProd_train = dataset_item.build_interactions(((mappingi[0], mappingi[1], 
 mappingProd_test = dataset_item.build_interactions(((mappingi[0], mappingi[1], mappingi[2])
                                                    for mappingi in no_prod_test))
 
-# print()
-# print('______________________________________________')
-# print('Building dataset using money count as rating.')
-# dataset_money = data.Dataset()
-# dataset_money.fit(users = all_customer[:], items = all_product[:])
-#
-# # build mapping
-# mappingMoney_train = dataset_money.build_interactions(((mappingi[0], mappingi[1], mappingi[2])
-#                                                     for mappingi in money_train))
-# mappingMoney_test = dataset_money.build_interactions(((mappingi[0], mappingi[1], mappingi[2])
-#                                                    for mappingi in money_test))
 
 from lightfm import LightFM
 from lightfm.evaluation import precision_at_k
@@ -171,19 +155,3 @@ print("ROC AUC metric for train: %.4f"
       % auc_score(model_prod, mappingProd_train[0]).mean())
 print("ROC AUC metric for test: %.4f"
       % auc_score(model_prod, mappingProd_test[0]).mean())
-
-# print()
-# print('______________________________________________')
-# print('Training using money count as rating.')
-# model_money = LightFM(learning_schedule = 'adagrad', loss='bpr')
-# model_money.fit(mappingMoney_train[0], sample_weight = mappingMoney_train[1])
-#
-# print("Train precision at 3rd: %.2f"
-#       % precision_at_k(model_money, mappingMoney_train[0], k = 3).mean())
-# print("Test precision at 3rd: %.2f"
-#       % precision_at_k(model_money, mappingMoney_test[0], k = 3).mean())
-#
-# print("ROC AUC metric for train: %.2f"
-#       % auc_score(model_money, mappingMoney_train[0]).mean())
-# print("ROC AUC metric for test: %.2f"
-#       % auc_score(model_money, mappingMoney_test[0]).mean())
