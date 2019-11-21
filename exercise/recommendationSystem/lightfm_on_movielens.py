@@ -122,7 +122,7 @@ from lightfm.evaluation import auc_score
 
 model = LightFM(learning_schedule = 'adagrad', loss='bpr')
 model.fit(mappingFeatures_train[0], item_features = itemFeatures, user_features = userFeatures
-          , sample_weight = mappingFeatures_train[1])
+          , sample_weight = mappingFeatures_train[1], epochs = 30, num_threads = 2, verbose = True)
 
 
 print("Train precision at 5th: %.2f"

@@ -83,29 +83,34 @@ def rescaling(dataset, column, list_of_ms):
     elif not isinstance(list_of_ms, list):
         print('Not the right object on param list_of_ms.')
         raise TypeError('Param 3 must be of list type')
-    elif False in [(isinstance(item, float) or isinstance(item, int)) for item in list_of_ms]:
+    elif False in [(item != True and item != False) and (isinstance(item, float) or isinstance(item, int))
+                 for item in list_of_ms]:
         print('Not the right object type for elements of param list_of_ms.')
-        stack = [(isinstance(item, float) or isinstance(item, int)) for item in list_of_ms]
+        stack = [(item != True and item != False) and (isinstance(item, float) or isinstance(item, int))
+                 for item in list_of_ms]
         raise TypeError('Number of element that is not a real number: %s' %stack.count(False))
     elif len(list_of_ms) != 4:
         print('Not the right number of element for param list_of_ms')
         raise IndexError('Param 3 must contains 4 elements.')
     else:
-        values = dataset[column].tolist()
-        returnV = []
-        list_of_ms.sort()
-        for element in values:
-            if element < list_of_ms[0]:
-                returnV.append(1)
-            elif element < list_of_ms[1]:
-                returnV.append(2)
-            elif element < list_of_ms[2]:
-                returnV.append(3)
-            elif element < list_of_ms[3]:
-                returnV.append(4)
-            else:
-                returnV.append(5)
-        dataset[column] = returnV
+        try:
+            values = dataset[column].tolist()
+            returnV = []
+            list_of_ms.sort()
+            for element in values:
+                if element < list_of_ms[0]:
+                    returnV.append(1)
+                elif element < list_of_ms[1]:
+                    returnV.append(2)
+                elif element < list_of_ms[2]:
+                    returnV.append(3)
+                elif element < list_of_ms[3]:
+                    returnV.append(4)
+                else:
+                    returnV.append(5)
+            dataset[column] = returnV
+        except KeyError:
+            print('Cannot find key %s in the dataframe. Nothing will change in the dataframe.' %column)
 
 # number based on real life observation of the datasets. Must change each time making any changes the dataset
 # or using a new one.
@@ -114,8 +119,8 @@ rescaling(by_no_product, 'so_luong', [2, 10, 100, 1000])
 # rename to rating
 by_no_product.rename(columns = {'so_luong': 'rating'}, inplace = True)
 
-all_customer = by_no_product.CustomerId.values
-all_product = by_no_product.ProductId.values
+all_customer = by_no_product.CustomerId.unique()
+all_product = by_no_product.ProductId.unique()
 
 # splitting dataset
 no_prod_train, no_prod_test = train_test_split(by_no_product.values, test_size = 0.2, random_state = 0)
@@ -144,7 +149,7 @@ print()
 print('______________________________________________')
 print('Training using item count as rating.')
 model_prod = LightFM(learning_schedule = 'adagrad', loss='bpr')
-model_prod.fit(mappingProd_train[0], sample_weight = mappingProd_train[1])
+model_prod.fit(mappingProd_train[0], sample_weight = mappingProd_train[1], epochs = 30, num_threads = 2, verbose = True)
 
 print("Train precision at 3rd: %.4f"
       % precision_at_k(model_prod, mappingProd_train[0], k = 3).mean())
