@@ -160,3 +160,9 @@ print("ROC AUC metric for train: %.4f"
       % auc_score(model_prod, mappingProd_train[0]).mean())
 print("ROC AUC metric for test: %.4f"
       % auc_score(model_prod, mappingProd_test[0]).mean())
+
+import accuracy
+
+print('FCP of train set: {0}'.format(accuracy.fcp(model_prod, mappingProd_train)))
+
+print('FCP of test set: {0}'.format(accuracy.fcp(model_prod, mappingProd_test)))
