@@ -166,3 +166,5 @@ import accuracy
 print('FCP of train set: {0}'.format(accuracy.fcp(model_prod, mappingProd_train)))
 
 print('FCP of test set: {0}'.format(accuracy.fcp(model_prod, mappingProd_test)))
+
+import math
